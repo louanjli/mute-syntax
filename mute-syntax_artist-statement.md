@@ -11,7 +11,7 @@ Rather than authoring fixed lines, I wrote a process. Each poem consists of **fo
 The vocabulary is drawn from three curated arrays:
 - **Subjects**: abstract or digital figures (“The cracked zero”, “A digit behind glass”, “The forgotten operand”)
 - **Verbs**: gestures of failure or transformation (“detunes with”, “loops back to”, “drowns beneath”)
-- **Metaphors**: sonic or ambiguous imagery (“a vowel buried in numbers”, “the lull between two equations”, “a pause no voice owns”)
+- **Metaphors**: textural or ambiguous imagery (“a vowel buried in numbers”, “the lull between two equations”, “a pause no voice owns”)
 
 The full pool includes approximately 90 elements. The generator randomly selects one from each array per line. No filtering, memory, or semantic checking occurs. Redundancy and awkwardness are not errors but material—texture through repetition and failure.
 
