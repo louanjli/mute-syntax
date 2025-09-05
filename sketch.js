@@ -1,15 +1,9 @@
-/*
-  sketch.js – Mute-Syntax
-  (c) 2025 Mohamed Louanjli
-  Licensed under the MIT License:
-  Permission is hereby granted, free of charge, to any person obtaining a copy of this software
-  and associated documentation files (the "Software"), to deal in the Software without restriction,
-  including without limitation the rights to use, copy, modify, merge, publish, distribute,
-  sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
-  furnished to do so, subject to the following conditions:
-  https://opensource.org/licenses/MIT
+/* 
+  Mute Syntax (c) 2025 Mohamed Louanjli
+  MIT Licence. See repository for details.
 */
 
+// -- Poetic pools --
 let subjects = [
   "The cracked zero", "An orphaned integer", "A signal in sleep mode", "The residue of seven",
   "An echo with syntax", "A miscounted breath", "A digit wearing fog", "This recursive silence",
@@ -44,9 +38,13 @@ let metaphors = [
 ];
 
 let poem = [];
-let quietMode = false;
+let quietMode = false;     
+let showInfo = false;      
+let infoDiv = null;        
 let autoTimer = 0;
 let menuHeight = 20;
+
+const infoText = "Mute Syntax is not a single poem but a system: an algorithmic engine that produces endless micro-poems from recombined fragments. Built with p5.js and styled after the 1984 Apple Macintosh interface, it explores the poetics of number, voice, and form. The vocabulary is recombined into four-line poems using a simple frame [subject] [verb] [metaphor]. Errors, awkwardness, and glitch are deliberate parts of the experience. Forget clears, Regenerate composes, Drift writes slowly in the background.";
 
 function setup() {
   createCanvas(512, 400);
@@ -59,8 +57,9 @@ function draw() {
   drawMacWindow();
   drawPoem();
   drawInstructions();
+  drawInfoButton();
 
-  if (quietMode) {
+  if (quietMode && !showInfo) {
     fill(255, 220);
     rect(0, 0, width, height);
     fill(0);
@@ -68,7 +67,7 @@ function draw() {
     text("quiet mode – poem drifting...", width / 2, height / 2 - 10);
     text("click anywhere to return", width / 2, height / 2 + 15);
 
-    if (frameCount - autoTimer > 180) {
+    if (frameCount - autoTimer > 240) { // ~4 seconds
       generatePoem();
       autoTimer = frameCount;
     }
@@ -77,15 +76,19 @@ function draw() {
 
 function drawMacWindow() {
   background(230);
+
+  // Border
   stroke(0);
   strokeWeight(4);
   noFill();
   rect(4, 4, width - 8, height - 8);
 
+  // Title bar
   fill(180);
   noStroke();
   rect(4, 4, width - 8, menuHeight);
 
+  // Menu text
   fill(0);
   textAlign(LEFT, CENTER);
   text("Forget", 12, 14);
@@ -107,27 +110,84 @@ function drawInstructions() {
   text("Click anywhere to regenerate. Use 'Drift' for ambient mode.", 20, height - 30);
 }
 
+function drawInfoButton() {
+  const r = 8;
+  const cx = width - 20;
+  const cy = 14;
+
+  noFill();
+  stroke(0);
+  strokeWeight(0.75);
+  ellipse(cx, cy, r * 2, r * 2);
+
+  noStroke();
+  fill(0);
+  textAlign(CENTER, CENTER);
+  text("i", cx, cy);
+}
+
+function openInfo() {
+  if (infoDiv) return;
+  showInfo = true;
+  infoDiv = document.createElement('div');
+  infoDiv.className = 'info-panel';
+  infoDiv.innerHTML = '<button class="info-close" aria-label="Close info" title="Close">×</button>' +
+                      '<h1>Mute Syntax: info</h1>' +
+                      '<div>' + infoText + '</div>';
+  document.body.appendChild(infoDiv);
+
+  const closeBtn = infoDiv.querySelector('.info-close');
+  closeBtn.addEventListener('click', closeInfo);
+}
+
+function closeInfo() {
+  showInfo = false;
+  if (infoDiv && infoDiv.parentNode) {
+    infoDiv.parentNode.removeChild(infoDiv);
+  }
+  infoDiv = null;
+}
+
 function mousePressed() {
-  if (mouseY > 4 && mouseY < 4 + menuHeight) {
-    if (mouseX >= 12 && mouseX < 65) {
-      clearPoem();
-      return;
+  if (!showInfo && mouseY > 4 && mouseY < 4 + menuHeight) {
+    // Left labels
+    if (mouseX >= 12 && mouseX < 65) { clearPoem(); return; }
+    if (mouseX >= 70 && mouseX < 165) { generatePoem(); return; }
+    if (mouseX >= 170 && mouseX < 250) { quietMode = !quietMode; autoTimer = frameCount; return; }
+  }
+
+  const r = 10;
+  const cx = width - 20;
+  const cy = 14;
+  const dx = mouseX - cx;
+  const dy = mouseY - cy;
+  const onInfo = (dx * dx + dy * dy) <= r * r;
+
+  if (mouseY > 4 && mouseY < 4 + menuHeight && onInfo) {
+    if (showInfo) {
+      closeInfo();
+    } else {
+      openInfo();
     }
-    if (mouseX >= 70 && mouseX < 165) {
-      generatePoem();
-      return;
-    }
-    if (mouseX >= 170 && mouseX < 250) {
-      quietMode = !quietMode;
-      autoTimer = frameCount;
-      return;
-    }
-  } else {
-    if (quietMode && frameCount - autoTimer > 30) {
-      quietMode = false;
-    } else if (!quietMode) {
-      generatePoem();
-    }
+    return;
+  }
+
+  
+  if (showInfo) return;
+
+  
+  if (quietMode && frameCount - autoTimer > 30) {
+    quietMode = false;
+  } else if (!quietMode) {
+    generatePoem();
+  }
+}
+
+function keyPressed() {
+  if (key === 'i' || key === 'I') {
+    if (showInfo) closeInfo(); else openInfo();
+  } else if (keyCode === ESCAPE && showInfo) {
+    closeInfo();
   }
 }
 
